@@ -1,17 +1,33 @@
 # vue-themed-style-loader
 
-A Webpack plugin to be used in conjunction with [vue-loader](https://github.com/vuejs/vue-loader/) to assist in generating themed builds of a [Vue.js](https://vuejs.org/) application.
+A Webpack plugin to be used in conjunction with [vue-loader] to assist in generating themed builds of a [Vue.js] application.
+
+* [Getting Started](#getting-started) 
+* [Use case](#use-case)
+* [Example](#example)
+* [Contributing](#contributing)
+* [Versioning](#versioning)
+* [License](#license)
+* [Acknowledgements](#acknowledgments)
 
 
-## Usage
+## Getting Started
 
-To use the `vue-themed-style-loader`, simply install the theme:
+### Prerequisites
+
+* [Node] v6.9.1 or greater
+* [Vue.js] v2.2.6 or greater
+* [Webpack] 2.3.3 or greater
+
+### Usage
+
+To use the `vue-themed-style-loader`, install the theme:
 
 ```
 npm install --save-dev vue-themed-style-loader
 ```
 
-And then add an entry to your webpack configuration file, after the `vue-loader`:
+Add an entry to your webpack configuration file, after the `vue-loader`:
 
 ```js
     ...
@@ -31,24 +47,21 @@ And then add an entry to your webpack configuration file, after the `vue-loader`
     ...
 ```
 
-And then begin specifying themes in your Vue component styles:
+And begin specifying themes in your Vue component styles:
 
 ```vue
-// Base theme
 <style>
 .classname {
     color: black;
 }
 </style>
 
-// Bold theme
 <style theme="bold">
 .heading {
     font-weight: bold;
 }
 </style>
 
-// Underline theme
 <style theme="underline">
 .heading {
     text-decoration: underline;
@@ -82,7 +95,7 @@ export default {
 
 Considering applying different styling "themes" which will alter the color of the heading, which may normally be done via a parent CSS class:
 
-```
+```vue
 <style>
 .heading { color: black; }
 
@@ -92,7 +105,7 @@ Considering applying different styling "themes" which will alter the color of th
 </style>
 ```
 
-This will certainly work, however, it doesn't scale very well as your application and number of themes grows.  The size of you stylesheet grows at least linearly with the number of themes, even though only one theme is likely being used at any given point in time.
+This will certainly work, however, it doesn't scale very well as your application and number of themes grows.  The size of you stylesheet grows with the number of themes, even though only one theme is likely being used at any given point in time.  the more complex the themes, the faster the stylesheet size will grow per theme.
 
 Instead, it would be ideal for our resulting stylesheet to only include the styles relevant to our current theme:
 
@@ -122,7 +135,7 @@ Or, even better, in the cases where a theme completely overrides a base style, i
 .theme-blue .heading { color: blue; }
 ```
 
-And, now that the base styles aren't being included, we no longer need the parent theme class anymore, and can reduce our output themed stylesheets to simply:
+And, if the base styles aren't being included, we don't need the parent theme class anymore, and could ideally reduce our output themed stylesheets to simply:
 
 ```css
 /* styles.css */
@@ -153,13 +166,13 @@ Let's alter the `<style>` sections of our component to use the `vue-themed-style
 .heading { color: red; }
 </style>
 
-// "red" theme
+// "blue" theme
 <style theme="blue">
 .heading { color: blue; }
 </style>
 ```
 
-Now, add the loader to your webpack config.  It is important to note that because all webpack loaders are run from right-to-left (see (Pitching Loaders)[https://webpack.js.org/api/loaders/#pitching-loader]), the `vue-themed-style-loader` must be specified _after_ the `vue-loader`.  this ensures it will execute _before_ the `vue-loader` to discard inactive themed style sections.  
+Now, add the loader to your webpack config.  It is important to note that because all webpack loaders are run from right-to-left (see [Pitching Loaders][pitching-loaders], the `vue-themed-style-loader` must be specified _after_ the `vue-loader`.  this ensures it will execute _before_ the `vue-loader` to discard inactive themed style sections.  
 
 Here's an example `webpack.config.js`:
 
@@ -181,13 +194,13 @@ Here's an example `webpack.config.js`:
     ...
 ```
 
-In this setup, with the `"red"` theme specified, the loader will only preserve unthemed and `theme="red"` `<style>` sections in your component, and will remove the `theme="blue"` section.
+In this setup, with the `"red"` theme specified, the loader will only preserve `<style>` and `<style theme="red">` sections in your component, and will remove the `<style theme="blue">` section.
 
 ### Replacing
 
 In cases where a given theme section wants to completely replace the base styles, the `replace` attribute can be specified on the `<style>` block:
 
-```
+```vue
 <style>
 .heading { color: black; }
 </style>
@@ -201,13 +214,13 @@ In cases where a given theme section wants to completely replace the base styles
 </style>
 ```
 
-This will result in the base styles also being stripped, and _only_ the `theme="red"` styles being included in the output.  If a single `replace` section is found for the active theme, then _all_ corresponding base styles will be stripped
+This will result in the base styles also being stripped, and _only_ the `<style theme="red">` section being included in the output.  If a single `replace` section is found for the active theme, then _all_ corresponding base styles will be stripped
 
 ### Scoped styles
 
-The removal algorithm operates independently on normal and scoped style blocks.  So, it can be chosen to replace in one scenario and inherit in another.  For example:
+The removal algorithm operates independently on normal versus scoped style blocks.  So, it can be chosen to replace in one scenario and inherit in another.  For example:
 
-```
+```vue
 <style>
 .heading { color: black; }
 </style>
@@ -232,3 +245,37 @@ In this scenario, the scoped base style would be maintained because no scoped se
 .heading { color: red; }
 .heading { text-decoration: underline; }
 ```
+
+
+## Contributing
+
+Contributions and Pull Requests are welcome!  Or if you find something wrong, please file an issue, and provide a detailed description of the problem.
+
+
+## Versioning
+
+This repository uses [SemVer] for versioning. For the versions available, see the [releases on this repository][releases]. 
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE] file for details
+
+
+## Acknowledgments
+
+* This would not be possible without [Webpack] and [Vue.js].  
+  * Notably, the [vue-template-compiler] module
+* This work was inspired by some of the interesting work we're doing over at [URBN]
+
+
+[Node]: https://nodejs.org/en/
+[LICENSE]: LICENSE 
+[pitching-loaders]: https://webpack.js.org/api/loaders/#pitching-loader
+[releases]: https://github.com/brophdawg11/vue-themed-style-loader/releases
+[SemVer]: http://semver.org/
+[Vue.js]: https://vuejs.org/
+[vue-loader]: https://github.com/vuejs/vue-loader/
+[vue-template-compiler]: https://www.npmjs.com/package/vue-template-compiler
+[Webpack]: https://webpack.js.org/
+[URBN]: https://github.com/urbn
