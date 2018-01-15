@@ -47,8 +47,7 @@
   },
   "dependencies": {
     "loader-utils": "1.1.0",
-    "lodash": "4.17.4",
-    "vue-template-compiler": "2.2.6"
+    "lodash": "4.17.4"
   },
   "peerDependencies": {
     "loader-utils": "^1.1.0",
