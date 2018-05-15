@@ -43,12 +43,10 @@
     "eslint-plugin-jest": "20.0.3",
     "husky": "0.14.3",
     "jest": "20.0.4",
-    "npm-watch": "0.2.0"
-  },
-  "dependencies": {
     "loader-utils": "1.1.0",
-    "lodash": "4.17.4",
-    "vue-template-compiler": "2.2.6"
+    "lodash": "4.17.10",
+    "npm-watch": "0.2.0",
+    "vue-template-compiler": "2.5.16"
   },
   "peerDependencies": {
     "loader-utils": "^1.1.0",

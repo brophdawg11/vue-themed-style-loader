@@ -198,7 +198,9 @@ In this setup, with the `"red"` theme specified, the loader will only preserve `
 
 ### Replacing
 
-In cases where a given theme section wants to completely replace the base styles, the `replace` attribute can be specified on the `<style>` block:
+#### Global replacement
+
+In cases where a given theme section wants to completely replace the base styles, the `replace` attribute can be specified without a value on the `<style>` block:
 
 ```vue
 <style>
@@ -214,11 +216,35 @@ In cases where a given theme section wants to completely replace the base styles
 </style>
 ```
 
-This will result in the base styles also being stripped, and _only_ the `<style theme="red">` section being included in the output.  If a single `replace` section is found for the active theme, then _all_ corresponding base styles will be stripped
+This will result in all the base styles being stripped, and _only_ the `<style theme="red">` section being included in the output.  If a single `replace` section is found for the active theme, then _all_ corresponding base styles will be stripped.
+
+#### Targeted Replacing
+
+In some cases, it may be beneficial to inherit _some_ base styles and replace others.  This can be done via targeted replacement.  IF you identify base style secton with an `id` attribute, you can then specify a specific ID to replace in the `replace` attribute.  For example:
+
+```vue
+<style>
+.heading { font-weight:bold; }
+</style>
+
+<style id="colors">
+.heading { color: black; }
+</style>
+
+<style theme="red" replace="colors">
+.heading { color: red; }
+</style>
+
+<style theme="blue" replace="colors">
+.heading { color: blue; }
+</style>
+```
+
+In this instance, our themed style only specified `replace="colors"`, so the base style block with id="colors"` will be replaced, but the base style block without an id will still be inherited.
 
 ### Scoped styles
 
-The removal algorithm operates independently on normal versus scoped style blocks.  So, it can be chosen to replace in one scenario and inherit in another.  For example:
+The removal algorithm operates independently on normal versus scoped style blocks.  A non-scoped block will only ever be replaced by a themed, non-scoped block.  And a scoped block will only ever be replaced by a themed, scoped block.  In this manner, they can be chosen to replace in one scenario and inherit in another.  For example:
 
 ```vue
 <style>

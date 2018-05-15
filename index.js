@@ -58,47 +58,57 @@ function replaceWithSpacer(style) {
     _.set(style, 'content', spacer);
 }
 
+// Determine if a given <style> section should be replaced, based on looking
+// at all other sections.  Rules for replacement:
+//  - Sections will only ever be replaced by sibling sections that are of the
+//    same "scoped" value (i.e., non-scoped or scoped)
+//  - All themed sections will be replaced if they are not the current theme
+//  - A themed section with a boolean `replace` attribute will replace _all_
+//    non-themed sections for the same scoped value
+//  - A themed section that passes a value to the `replace` attribute will
+//    only replace non-themed sections with `id="..."` where the value matches
+//    the value of the `replace` attribute
+function shouldReplaceCurrentSection(style, styles, options) {
+    const { attrs } = style;
+    const sectionScoped = _.get(attrs, 'scoped') === true;
+    const sectionTheme = _.get(attrs, 'theme');
+    const isThemed = sectionTheme != null && sectionTheme.length > 0;
+    const sectionId = _.get(attrs, 'id');
+
+    // Replace all non-active themed sections
+    if (isThemed) {
+        return sectionTheme !== options.theme;
+    }
+
+    // This is a base section, see if we find a themed section to replace us
+    const replacementStyle = styles
+        // Only look at subsequent active themes
+        .filter(s => _.get(s.attrs, 'theme') === options.theme)
+        // Of the same scope
+        .filter(s => ((_.get(s.attrs, 'scoped') === true) === sectionScoped))
+        .find(s => (
+            // When we find a boolean replace attribute, we always replace
+            _.get(s.attrs, 'replace') === true ||
+            // Or we replace if we find a themed section that specified to
+            // replace our specific id
+            (sectionId != null && _.get(s.attrs, 'replace') === sectionId)
+        ));
+
+    return replacementStyle != null;
+}
+
 // Given a style section from vue-template-compiler, generate the resulting
 // output style section, stripping inactive theme style blocks
-function genStyleSection(style, replacements, options) {
-    const blockTheme = _.get(style.attrs, 'theme');
-    if (blockTheme) {
-
-        if (blockTheme !== options.theme) {
-            // This style block specifies an inactive theme, replace the block
-            // with blank lines, so that line numbers remain the same as the
-            // input file
-            replaceWithSpacer(style);
-        }
-
-    } else if ((replacements.global && !style.scoped) ||
-               (replacements.scoped && style.scoped)) {
-        // This is an unbranded style theme and we've found an active theme
-        // 'replace' block elsewhere, so clear out these base styles
+function genStyleSection(style, styles, options) {
+    if (shouldReplaceCurrentSection(style, styles, options)) {
         replaceWithSpacer(style);
     }
 
-    // Remove the 'theme' and 'replace' attributes from the output set of
-    // attributes since they're not really a Vue-supported attribute
-    _.set(style, 'attrs', _.omit(style.attrs, 'theme', 'replace'));
+    // Remove the 'id', theme' and 'replace' attributes from the output set of
+    // attributes since they're not really valid SFC <style> attributes
+    _.set(style, 'attrs', _.omit(style.attrs, 'id', 'theme', 'replace'));
 
     return genSection('style', style);
-}
-
-// Utility function to determine if this component contains theme replacement
-// styles for global or scoped style sections.  If so, we'll use those to clear
-// out the corresponding base styles we encounter
-function getReplacements(styles, options) {
-    // Is this block for the current active theme
-    const isActiveTheme = s => _.get(s.attrs, 'theme') === options.theme;
-    // Does the style block contain the replace attribute
-    const hasReplace = s => _.get(s.attrs, 'replace');
-    return {
-        global: styles.filter(s => !s.scoped && isActiveTheme(s))
-                      .find(s => hasReplace(s)) != null,
-        scoped: styles.filter(s => s.scoped && isActiveTheme(s))
-                      .find(s => hasReplace(s)) != null,
-    };
 }
 
 function vueThemedStyleLoader(source) {
@@ -116,9 +126,8 @@ function vueThemedStyleLoader(source) {
     const script = genSection('script', parts.script);
 
     // Loop over style sections, eliminating inactive brands
-    const replacements = getReplacements(parts.styles, options);
     const styles = parts.styles
-                        .map(s => genStyleSection(s, replacements, options))
+                        .map(s => genStyleSection(s, parts.styles, options))
                         .join('\n');
 
     // Reconstruct the Vue Single File Component

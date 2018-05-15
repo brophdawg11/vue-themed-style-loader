@@ -323,6 +323,90 @@ test('replaces base styles when themes specify', () => {
     expect(actual).toBe(expected);
 });
 
+test('replaces targeted base style section when themes specify', () => {
+    const input = `
+<style>
+.classname {
+    color: red;
+}
+</style>
+
+<style id="replace-me">
+.classname {
+    color: blue;
+}
+</style>
+
+<style theme="a" replace="replace-me">
+.classname {
+    color: orange;
+}
+</style>
+
+<style scoped>
+.classname {
+    color: green;
+}
+</style>
+
+<style scoped id="replace-me-too">
+.classname {
+    color: yellow;
+}
+</style>
+
+<style scoped theme="a" replace="replace-me-too">
+.classname {
+    color: blue;
+}
+</style>
+`;
+    const expected = `
+<style>
+.classname {
+    color: red;
+}
+</style>
+
+<style>
+
+
+
+</style>
+
+<style>
+.classname {
+    color: orange;
+}
+</style>
+
+<style scoped>
+.classname {
+    color: green;
+}
+</style>
+
+<style scoped>
+
+
+
+</style>
+
+<style scoped>
+.classname {
+    color: blue;
+}
+</style>
+
+`.trim();
+
+    loaderUtils.getOptions.mockReturnValue({
+        theme: 'a',
+    });
+    const actual = loader(input).trim();
+    expect(actual).toBe(expected);
+});
+
 test('handles all-encompassing scenario', () => {
     const input = `
 <style>
@@ -401,6 +485,90 @@ test('handles all-encompassing scenario', () => {
 
     loaderUtils.getOptions.mockReturnValue({
         theme: 'b',
+    });
+    const actual = loader(input).trim();
+    expect(actual).toBe(expected);
+});
+
+test('handles mixture of targeted and global replacements', () => {
+    const input = `
+<style>
+.classname {
+    color: red;
+}
+</style>
+
+<style id="replace-me">
+.classname {
+    color: blue;
+}
+</style>
+
+<style theme="a" replace="replace-me">
+.classname {
+    color: orange;
+}
+</style>
+
+<style scoped>
+.classname {
+    color: green;
+}
+</style>
+
+<style scoped>
+.classname {
+    color: yellow;
+}
+</style>
+
+<style scoped theme="a" replace>
+.classname {
+    color: blue;
+}
+</style>
+`;
+    const expected = `
+<style>
+.classname {
+    color: red;
+}
+</style>
+
+<style>
+
+
+
+</style>
+
+<style>
+.classname {
+    color: orange;
+}
+</style>
+
+<style scoped>
+
+
+
+</style>
+
+<style scoped>
+
+
+
+</style>
+
+<style scoped>
+.classname {
+    color: blue;
+}
+</style>
+
+`.trim();
+
+    loaderUtils.getOptions.mockReturnValue({
+        theme: 'a',
     });
     const actual = loader(input).trim();
     expect(actual).toBe(expected);
