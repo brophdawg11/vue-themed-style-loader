@@ -1,6 +1,6 @@
 {
   "name": "vue-themed-style-loader",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Webpack loader to handle themed style builds of Vue.js applications",
   "main": "index.js",
   "scripts": {

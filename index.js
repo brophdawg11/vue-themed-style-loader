@@ -130,8 +130,17 @@ function vueThemedStyleLoader(source) {
                         .map(s => genStyleSection(s, parts.styles, options))
                         .join('\n');
 
+    let output = '';
+
+    // Maintain any custom blocks at the top of the file
+    // This has an assumption now that they are all above <template>
+    if (_.isArray(parts.customBlocks)) {
+        output += parts.customBlocks.reduce((acc, b) =>
+            `${acc}<${b.type}>${b.content}</${b.type}>\n\n`, '');
+    }
+
     // Reconstruct the Vue Single File Component
-    const output = `${template}\n${script}\n${styles}`;
+    output += `${template}\n${script}\n${styles}`;
 
     if (options.debug) {
         const filePath = this.resourcePath;
