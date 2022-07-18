@@ -1,6 +1,6 @@
 {
   "name": "vue-themed-style-loader",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Webpack loader to handle themed style builds of Vue.js applications",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brophdawg11/vue-themed-style-loader.git"
+    "url": "git+https://github.com/urbn/vue-themed-style-loader.git"
   },
   "keywords": [
     "vue",
@@ -29,12 +29,12 @@
     "theme",
     "css"
   ],
-  "author": "matt@brophy.org",
+  "author": "skennedy@urbn.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brophdawg11/vue-themed-style-loader/issues"
+    "url": "https://github.com/urbn/vue-themed-style-loader/issues"
   },
-  "homepage": "https://github.com/brophdawg11/vue-themed-style-loader#readme",
+  "homepage": "https://github.com/urbn/vue-themed-style-loader#readme",
   "devDependencies": {
     "eslint": "3.19.0",
     "eslint-config-airbnb-base": "11.1.3",

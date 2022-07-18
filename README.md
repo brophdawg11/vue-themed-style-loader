@@ -2,7 +2,7 @@
 
 A Webpack plugin to be used in conjunction with [vue-loader] to assist in generating themed builds of a [Vue.js] application.
 
-* [Getting Started](#getting-started) 
+* [Getting Started](#getting-started)
 * [Use case](#use-case)
 * [Example](#example)
 * [Contributing](#contributing)
@@ -172,7 +172,7 @@ Let's alter the `<style>` sections of our component to use the `vue-themed-style
 </style>
 ```
 
-Now, add the loader to your webpack config.  It is important to note that because all webpack loaders are run from right-to-left (see [Pitching Loaders][pitching-loaders], the `vue-themed-style-loader` must be specified _after_ the `vue-loader`.  this ensures it will execute _before_ the `vue-loader` to discard inactive themed style sections.  
+Now, add the loader to your webpack config.  It is important to note that because all webpack loaders are run from right-to-left (see [Pitching Loaders][pitching-loaders], the `vue-themed-style-loader` must be specified _after_ the `vue-loader`.  this ensures it will execute _before_ the `vue-loader` to discard inactive themed style sections.
 
 Here's an example `webpack.config.js`:
 
@@ -280,7 +280,7 @@ Contributions and Pull Requests are welcome!  Or if you find something wrong, pl
 
 ## Versioning
 
-This repository uses [SemVer] for versioning. For the versions available, see the [releases on this repository][releases]. 
+This repository uses [SemVer] for versioning. For the versions available, see the [releases on this repository][releases].
 
 
 ## License
@@ -290,15 +290,15 @@ This project is licensed under the MIT License - see the [LICENSE] file for deta
 
 ## Acknowledgments
 
-* This would not be possible without [Webpack] and [Vue.js].  
+* This would not be possible without [Webpack] and [Vue.js].
   * Notably, the [vue-template-compiler] module
 * This work was inspired by some of the interesting work we're doing over at [URBN]
 
 
 [Node]: https://nodejs.org/en/
-[LICENSE]: LICENSE 
+[LICENSE]: LICENSE
 [pitching-loaders]: https://webpack.js.org/api/loaders/#pitching-loader
-[releases]: https://github.com/brophdawg11/vue-themed-style-loader/releases
+[releases]: https://github.com/urbn/vue-themed-style-loader/releases
 [SemVer]: http://semver.org/
 [Vue.js]: https://vuejs.org/
 [vue-loader]: https://github.com/vuejs/vue-loader/

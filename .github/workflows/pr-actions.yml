@@ -1,0 +1,56 @@
+name: PR Checks
+
+# Run on pull requests to main
+on:
+  pull_request:
+    branches:
+      - main
+    # Defaults + ready_for_review to trigger a re-run when a Draft PR is converted to a normal PR
+    # See: https://github.community/t/dont-run-actions-on-draft-pull-requests/16817/17
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+# Only allow one build per PR source branch to run at once, cancelling in-progress
+# builds when new builds arrive
+# See: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idconcurrency
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
+# Define the separate jobs to run
+jobs:
+  # Checks if the PR is in draft status and fails if so, which does 2 things:
+  #  - Prevents the PR from being merged in that state
+  #  - Prevents all downstream jobs from running
+  draft:
+    name: "Check Draft Status"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Fail draft PRs"
+        if: github.event.pull_request.draft == true
+        run: |
+          echo "Skipping execution for draft PR"
+          exit 1
+      - run: echo "PR is not Draft"
+
+  test:
+    name: "Check Linting & Tests"
+    needs: draft
+    runs-on: ubuntu-latest
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v2
+      - name: set node version
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.13.2"
+          cache: 'npm'
+      - name: install node modules
+        run: npm ci
+      - name: run linting
+        run: npm run lint
+      - name: run tests
+        run: npm run test
